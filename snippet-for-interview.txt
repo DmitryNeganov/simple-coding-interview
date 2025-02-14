@@ -6,6 +6,10 @@ public class User {
     public String password;
 }
 
+public interface UserRepo extends JpaRepository<User, Long> {
+    User getUserById(Long id);
+}
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
