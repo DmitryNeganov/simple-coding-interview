@@ -1,15 +1,22 @@
-package org.dvn.simple_coding_interview.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.dvn.simple_coding_interview.repo.User;
-import org.dvn.simple_coding_interview.repo.UserService;
-import org.dvn.simple_coding_interview.service.clients.KafkaClientService;
-import org.dvn.simple_coding_interview.service.clients.LoggingClientService;
-import org.dvn.simple_coding_interview.service.clients.StatisticsClientService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+public class User {
+    public Long id;
+    public String username;
+    public String email;
+    public String password;
+}
 
-import java.util.logging.Logger;
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepo userRepo;
+
+    public User getUser(Long id) {
+        User user = userRepo.getUserById(id); //finding user by id
+        return user;
+    }
+}
 
 
 /**
@@ -20,13 +27,13 @@ import java.util.logging.Logger;
  */
 @Slf4j
 @Service
-public class SomeMainService {
+public class MainService {
 
     private Logger LOGGER;
 
     private KafkaClientService kafkaClientService;
 
-    private LoggingClientService loggingClientService;
+    private OtherMicroserviceClientService otherMicroserviceClientService;
 
     @Autowired
     private StatisticsClientService statisticsClientService;
@@ -35,9 +42,9 @@ public class SomeMainService {
 
     private int counter;
 
-    public SomeMainService(Logger LOGGER) {
+    public MainService(Logger LOGGER) {
         this.LOGGER = Logger.getLogger("SomeMainLogger");
-        this.userService = new UserService();
+        this.userService = new UserService(new UserRepo());
     }
 
     @Autowired
@@ -46,8 +53,8 @@ public class SomeMainService {
     }
 
     @Autowired
-    public void setLoggingClientService(LoggingClientService loggingClientService) {
-        this.loggingClientService = loggingClientService;
+    public void setLoggingClientService(OtherMicroserviceClientService otherMicroserviceClientService) {
+        this.otherMicroserviceClientService = otherMicroserviceClientService;
     }
 
     public User getUser(Long id) {
@@ -62,13 +69,19 @@ public class SomeMainService {
 
         user.id = userFromRepo.id;
         user.username = userFromRepo.username;
+        user.email = userFromRepo.email;
         user.password = userFromRepo.password;
 
         System.out.println("Sending messages to services");
         kafkaClientService.send("Request #" + counter + " for user with id " + id);
-        loggingClientService.send("Request #" + counter + " for user with id " + id);
+        otherMicroserviceClientService.send("Request #" + counter + " for user with id " + id);
         statisticsClientService.send("Request #" + counter + " for user with id " + id);
 
         return user;
     }
+}
+
+
+public interface ClientService {
+    void send(String message);
 }
