@@ -26,7 +26,7 @@ public class UserService {
 /**
  * Service class for controller requests.
  * One of the method is to find and return User data.
- * Each request should be sent to Kafka, Logger microservice and Statistics microservice
+ * Each request should be sent to Kafka, Other microservice and Statistics microservice
  *
  */
 @Slf4j

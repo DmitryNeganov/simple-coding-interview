@@ -10,13 +10,14 @@ import org.dvn.simple_coding_interview.service.clients.StatisticsClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 
 /**
  * Service class for controller requests.
  * One of the method is to find and return User data.
- * Each request should be sent to Kafka, Logger microservice and Statistics microservice
+ * Each request should be sent to Kafka, Other microservice and Statistics microservice
  *
  */
 @Slf4j
@@ -47,7 +48,7 @@ public class MainService {
     }
 
     @Autowired
-    public void setLoggingClientService(OtherMicroserviceClientService otherMicroserviceClientService) {
+    public void setOtherClientService(OtherMicroserviceClientService otherMicroserviceClientService) {
         this.otherMicroserviceClientService = otherMicroserviceClientService;
     }
 
@@ -65,6 +66,8 @@ public class MainService {
         user.username = userFromRepo.username;
         user.email = userFromRepo.email;
         user.password = userFromRepo.password;
+
+
 
         System.out.println("Sending messages to services");
         kafkaClientService.send("Request #" + counter + " for user with id " + id);
